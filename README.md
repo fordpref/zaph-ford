@@ -1,0 +1,3 @@
+Very simple Android app with a big button to send a UDP packet to a beaglebone with a UDP listener to activate a relay.
+
+Garage.py is the listener to use on the beaglebone/raspberry pi/etc...
