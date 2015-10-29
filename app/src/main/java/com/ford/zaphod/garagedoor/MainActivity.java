@@ -17,61 +17,74 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private final static String MESSAGE = "31337 activate ";
     private final static String IPADDRESS = "172.17.10.25";
     private final static int PORT = 6736;
+    private boolean doorstate = false;
     private Button mButton;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String status;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mButton = (Button)findViewById(R.id.garagebutton);
-        //mButton.setBackgroundColor(Color.RED);
         mButton.setOnClickListener(this);
-        status = getWifiName(this);
+        doorstate = getWifiState(this);
     }
 
-    protected void onResume(Bundle savedInstanceState) {
-        String status;
+
+    protected void onStart(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
         mButton = (Button)findViewById(R.id.garagebutton);
-        //mButton.setBackgroundColor(Color.RED);
         mButton.setOnClickListener(this);
-        status = getWifiName(this);
+        doorstate = getWifiState(this);
     }
 
-    public String getWifiName(Context context) {
+
+    protected void onResume(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_main);
+        mButton = (Button)findViewById(R.id.garagebutton);
+        mButton.setOnClickListener(this);
+        doorstate = getWifiState(this);
+    }
+
+    protected void onRestart(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_main);
+        mButton = (Button)findViewById(R.id.garagebutton);
+        mButton.setOnClickListener(this);
+        doorstate = getWifiState(this);
+    }
+
+    public boolean getWifiState(Context context) {
         android.net.wifi.WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ssid = " ";
+        boolean dstate = false;
         if (manager.isWifiEnabled()) {
             WifiInfo wifiInfo = manager.getConnectionInfo();
             if (wifiInfo != null) {
                 NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-                //if (state == NetworkInfo.DetailedState.CONNECTED) {
                 ssid = wifiInfo.getSSID();
                 ssid = ssid.substring(1, ssid.length() - 1);
                 if (ssid.equalsIgnoreCase("solarsphere")) {
                     mButton.setBackgroundColor(Color.GREEN);
-                    mButton.setText("Actuate Door\nConnected to Solarsphere");
+                    mButton.setText("Actuate Door");
+                    dstate = true;
                 } else {
                     mButton.setBackgroundColor(Color.RED);
-                    mButton.setText("Door Not Available");
+                    mButton.setText("Door Not Available\nwifi:  " + ssid);
+                    dstate = false;
                 }
-                //mButton.setText(ssid);  //Troubleshooting line
-                return ssid;
-                //}
             }
         } else {
             mButton.setBackgroundColor(Color.GRAY);
-            mButton.setText("No WIFI\nDoor Not Available");
+            mButton.setText("WIFI Unavailable\nDoor Disabled");
+            dstate = false;
         }
-        return ssid;
+        return dstate;
     }
 
     @Override
     public void onClick (View v) {
-        //if (getWifiName(this).compareTo("solarsphere") == 0) {
+        if (doorstate) {
             new Thread(new Runnable() {
                 public void run() {
                     try {
@@ -88,9 +101,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 }
             }).start();
-        //} else {
+        } else {
             //code to stop the service
-        //}
+        }
 
     }
 }
