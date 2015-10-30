@@ -35,10 +35,12 @@ def listener():
         data = data[:-1]
         print data
 	if data == '31337 activate':
-            send = sock.sendto('Activating Door\n\n', address)
+            send = sock.sendto('Activating Door\n', address)
             activate_relay()
+        elif data == '31337 status':
+            send = sock.sendto('READY\n', address)
         else:
-            send = sock.sendto('Fuckoff Asshole\n\n', address)
+            send = sock.sendto('Incorrect\n', address)
 
             
 
